@@ -13,6 +13,8 @@ sudo python3 main.py
 # yes, the sudo because the keyboard lib can not be use undo normal user,
 ```
 
-## SCREENSHOT
+Use you arrw keys to eat the egg.
 
-![screenshot](./screenshot.png)
+## DEMO
+
+![screenshot](./screenshot.gif)
