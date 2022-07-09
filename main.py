@@ -21,7 +21,7 @@ ball_x, ball_y = randint(0, WIDTH - 5), randint(0, HEIGHT - 5)
 
 ENV_GENERATED = False
 
-PNJS = ['🐄', '🐑']
+PNJS = ['🐄', '🐑', '🦆', '🐓', '🐃', '🐂', '🦏', '🐎', '🐖', '🦍', '🐆']
 
 max_time = 100
 
@@ -53,7 +53,7 @@ def generate_env():
         for i in range(randint(2, 10)):
             map_it_randomly('🪨')
 
-        for i in range(randint(5, 30)):
+        for i in range(randint(5, 20)):
             map_it_randomly(PNJS[randint(0, len(PNJS) - 1)])
 
         ENV_GENERATED = True
