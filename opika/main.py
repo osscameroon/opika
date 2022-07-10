@@ -1,5 +1,5 @@
 import time
-from os import system
+import os
 from random import randint
 from threading import Thread
 
@@ -14,6 +14,7 @@ pos_x, pos_y = randint(0, WIDTH - 5), randint(0, HEIGHT - 5)
 
 SCENE = [[" " for y in range(HEIGHT)] for x in range(WIDTH)]
 SCENE[pos_x][pos_y] = ME
+
 SCORE = 0
 
 BALL = "🥚"
@@ -23,15 +24,21 @@ ENV_GENERATED = False
 
 PNJS = ["🐄", "🐑", "🦆", "🐓", "🐃", "🐂", "🦏", "🐎", "🐖", "🦍", "🐆"]
 
-max_time = 100
+SHOULD_REND = True
 
 
 def map_it(elt, x, y):
+    global SHOULD_REND
+
     SCENE[x][y] = elt
+    SHOULD_REND = True
 
 
 def clean_it(x, y):
+    global SHOULD_REND
+
     SCENE[x][y] = " "
+    SHOULD_REND = True
 
 
 def map_it_and_clean(elt, x0, y0, x1, y1):
@@ -47,14 +54,14 @@ def generate_env():
     global ENV_GENERATED
 
     if not ENV_GENERATED:
-        for i in range(randint(5, 20)):
+        for i in range(randint(5, 10)):
             map_it_randomly("🌲")
             map_it_randomly("🌳")
 
         for i in range(randint(2, 10)):
             map_it_randomly("🪨")
 
-        for i in range(randint(5, 30)):
+        for i in range(randint(5, 50)):
             map_it_randomly(PNJS[randint(0, len(PNJS) - 1)])
 
         ENV_GENERATED = True
@@ -106,43 +113,56 @@ def move_down():
         pos_y += 1
 
 
-def move_pnjs(x, y):
-    global SCENE
+def clearConsole():
+    # We need to clean the screen when there is a change on it
+    command = 'clear'
+    # If Machine is running on Windows, use cls
+    if os.name in ('nt', 'dos'):
+        command = 'cls'
+    os.system(command)
 
-    while True:
-        for j in range(0, HEIGHT - 1):
-            for i in range(0, WIDTH - 1):
-                if SCENE[i][i] in PNJS:
-                    randd = randint(1, 100)
-                    if randd % 2 == 0:
-                        map_it_and_clean(SCENE[i][j], i, j, i + 1, j)
-                    elif randd % 3 == 0 or randd % 5 == 0:
-                        map_it_and_clean(SCENE[i][j], i, j, i - 1, j)
-                    time.sleep(1)
 
-        time.sleep(0.3)
+# def move_pnjs():
+#     global SCENE
+
+#     while True:
+#         for j in range(0, HEIGHT - 1):
+#             for i in range(0, WIDTH - 1):
+#                 if SCENE[i][i] in PNJS:
+#                     randd = randint(1, 100)
+#                     if randd % 2 == 0:
+#                         map_it_and_clean(SCENE[i][j], i, j, i + 1, j)
+#                     elif randd % 3 == 0 or randd % 5 == 0:
+#                         map_it_and_clean(SCENE[i][j], i, j, i - 1, j)
+#                     time.sleep(1)
+
+#         time.sleep(0.5)
 
 
 def refresh_scene():
-    global SCENE, max_time
+    global SCENE, SHOULD_REND
 
     while True:
-        rend_this = ""
-        for j in range(0, HEIGHT - 1):
-            for i in range(0, WIDTH - 1):
-                rend_this += SCENE[i][j] + ' '
-            rend_this += '\n'
+        if SHOULD_REND:
+            clearConsole()
 
-        print(rend_this)
-        print(f'{pos_x}/{pos_y} => score : {SCORE} | {max_time}s')
-        print('_' * 100)
-        time.sleep(0.033)
+            rend_this = ""
+            for j in range(0, HEIGHT - 1):
+                for i in range(0, WIDTH - 1):
+                    rend_this += SCENE[i][j] + ' '
+                rend_this += '\n'
 
-        system('clear')
+            rend_this += f'{pos_x}/{pos_y} => score : {SCORE}\n'
+            rend_this += '_' * 100
+
+            print(rend_this)
+            SHOULD_REND = False
+
+        time.sleep(0.05)
 
 
 def render(key):
-    global KEYS, SCENE, SCORE, max_time
+    global KEYS, SCENE, SCORE
 
     while True:
         make_ball()
@@ -162,25 +182,14 @@ def render(key):
             move_up()
 
 
-def timer_decr():
-    global max_time
-
-    while max_time > 0:
-        time.sleep(1)
-        max_time -= 1
-
-
 if __name__ == "__main__":
     generate_env()
 
     thread_scene = Thread(target=refresh_scene)
     thread_scene.start()
 
-    thread_pnjs = Thread(target=move_pnjs)
-    thread_pnjs.start()
-
-    thread_time = Thread(target=timer_decr)
-    thread_time.start()
+    # thread_pnj = Thread(target=move_pnjs)
+    # thread_pnj.start()
 
     threads = [Thread(target=render, kwargs={'key': key}) for key in KEYS]
 
