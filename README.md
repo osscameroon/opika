@@ -1,19 +1,28 @@
 ## OPIKA GAME
 
+Meet a simple funny terminal game.
+
 ## HOW TO INSTALL
 
 ```
-pip install -r requirements.txt
+make install-deps
+
+# For dev purposes
+make install-dev-deps
+
+# For the linter
+make lint
 ```
 
 ## HOW TO LAUNCH
 
 ```
-sudo python3 main.py
+make run
+# it will request to run on sudo,
 # yes, the sudo because the keyboard lib can not be use undo normal user,
 ```
 
-Use you arrw keys to eat the egg.
+Use you arrow keys to eat the egg accross the environment.
 
 ## DEMO
 
