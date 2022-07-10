@@ -105,13 +105,10 @@ def move_down():
         pos_y += 1
 
 
-def render(key):
-    global KEYS, SCENE, SCORE, max_time
+def refresh_scene():
+    global SCENE, max_time
 
     while True:
-        generate_env()
-        make_ball()
-
         rend_this = ''
         for j in range(0, HEIGHT - 1):
             for i in range(0, WIDTH - 1):
@@ -121,6 +118,17 @@ def render(key):
         print(rend_this)
         print(f'{pos_x}/{pos_y} => score : {SCORE} | {max_time}')
         print('______________________________________________')
+        time.sleep(0.04)
+
+        system('clear')
+
+
+def render(key):
+    global KEYS, SCENE, SCORE, max_time
+
+    while True:
+        generate_env()
+        make_ball()
 
         keyboard.wait(key)
 
@@ -136,8 +144,6 @@ def render(key):
         if key == 'Up':
             move_up()
 
-        system('clear')
-
 
 def timer_decr():
     global max_time
@@ -146,6 +152,9 @@ def timer_decr():
         time.sleep(1)
         max_time -= 1
 
+
+thread_scene = Thread(target=refresh_scene)
+thread_scene.start()
 
 thread_time = Thread(target=timer_decr)
 thread_time.start()
