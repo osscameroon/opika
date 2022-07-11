@@ -1,5 +1,5 @@
-import time
 import os
+import time
 from random import randint
 from threading import Thread
 
@@ -23,22 +23,33 @@ ball_x, ball_y = randint(0, WIDTH - 5), randint(0, HEIGHT - 5)
 ENV_GENERATED = False
 
 PNJS = ["🐄", "🐑", "🦆", "🐓", "🐃", "🐂", "🦏", "🐎", "🐖", "🦍", "🐆"]
+TREES = ["🌲", "🌳"]
 
 SHOULD_REND = True
+
+
+def is_in_the_with(x):
+    return WIDTH > x >= 0
+
+
+def is_in_the_height(y):
+    return HEIGHT > y >= 0
 
 
 def map_it(elt, x, y):
     global SHOULD_REND
 
-    SCENE[x][y] = elt
-    SHOULD_REND = True
+    if is_in_the_height(y) and is_in_the_with(x):
+        SCENE[x][y] = elt
+        SHOULD_REND = True
 
 
 def clean_it(x, y):
     global SHOULD_REND
 
-    SCENE[x][y] = " "
-    SHOULD_REND = True
+    if is_in_the_height(y) and is_in_the_with(x):
+        SCENE[x][y] = " "
+        SHOULD_REND = True
 
 
 def map_it_and_clean(elt, x0, y0, x1, y1):
@@ -50,13 +61,27 @@ def map_it_randomly(elt):
     map_it(elt, randint(0, WIDTH - 1), randint(0, HEIGHT - 1))
 
 
+def generate_trees():
+    global ENV_GENERATED, TREES
+
+    for tree in TREES:
+        # we can build some forest here
+        x, y = randint(0, WIDTH - 1), randint(0, HEIGHT - 1)
+
+        map_it(tree, x, y)
+        map_it(tree, x + randint(1, 3), y)
+        map_it(tree, x, y + randint(1, 3))
+
+        map_it(tree, abs(x - randint(1, 3)), y)
+        map_it(tree, x, abs(y - randint(1, 3)))
+
+
 def generate_env():
     global ENV_GENERATED
 
     if not ENV_GENERATED:
-        for i in range(randint(5, 10)):
-            map_it_randomly("🌲")
-            map_it_randomly("🌳")
+        for i in range(randint(1, 20)):
+            generate_trees()
 
         for i in range(randint(2, 10)):
             map_it_randomly("🪨")
@@ -80,45 +105,41 @@ def make_ball():
 def move_left():
     global SCENE, WIDTH, pos_x, pos_y
 
-    if WIDTH > pos_x - 1 >= 0:
+    if is_in_the_with(pos_x - 1):
         map_it_and_clean(ME, pos_x, pos_y, pos_x - 1, pos_y)
-
         pos_x -= 1
 
 
 def move_right():
     global SCENE, WIDTH, pos_x, pos_y
 
-    if WIDTH > pos_x + 1 >= 0:
+    if is_in_the_with(pos_x + 1):
         map_it_and_clean(ME, pos_x, pos_y, pos_x + 1, pos_y)
-
         pos_x += 1
 
 
 def move_up():
     global SCENE, HEIGHT, pos_x, pos_y
 
-    if HEIGHT > pos_y - 1 >= 0:
+    if is_in_the_height(pos_y - 1):
         map_it_and_clean(ME, pos_x, pos_y, pos_x, pos_y - 1)
-
         pos_y -= 1
 
 
 def move_down():
     global SCENE, HEIGHT, pos_x, pos_y
 
-    if HEIGHT > pos_y + 1 >= 0:
+    if is_in_the_height(pos_y + 1):
         map_it_and_clean(ME, pos_x, pos_y, pos_x, pos_y + 1)
-
         pos_y += 1
 
 
 def clearConsole():
     # We need to clean the screen when there is a change on it
-    command = 'clear'
+    command = "clear"
     # If Machine is running on Windows, use cls
-    if os.name in ('nt', 'dos'):
-        command = 'cls'
+    if os.name in ("nt", "dos"):
+        command = "cls"
     os.system(command)
 
 
@@ -149,11 +170,11 @@ def refresh_scene():
             rend_this = ""
             for j in range(0, HEIGHT - 1):
                 for i in range(0, WIDTH - 1):
-                    rend_this += SCENE[i][j] + ' '
-                rend_this += '\n'
+                    rend_this += SCENE[i][j] + " "
+                rend_this += "\n"
 
-            rend_this += f'{pos_x}/{pos_y} => score : {SCORE}\n'
-            rend_this += '_' * 100
+            rend_this += f"{pos_x}/{pos_y} => score : {SCORE}\n"
+            rend_this += "_" * 100
 
             print(rend_this)
             SHOULD_REND = False
@@ -169,16 +190,16 @@ def render(key):
 
         keyboard.wait(key)
 
-        if key == 'Left':
+        if key == "Left":
             move_left()
 
-        if key == 'Right':
+        if key == "Right":
             move_right()
 
-        if key == 'Down':
+        if key == "Down":
             move_down()
 
-        if key == 'Up':
+        if key == "Up":
             move_up()
 
 
@@ -191,7 +212,7 @@ if __name__ == "__main__":
     # thread_pnj = Thread(target=move_pnjs)
     # thread_pnj.start()
 
-    threads = [Thread(target=render, kwargs={'key': key}) for key in KEYS]
+    threads = [Thread(target=render, kwargs={"key": key}) for key in KEYS]
 
     for thread in threads:
         thread.start()
