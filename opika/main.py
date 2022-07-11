@@ -23,7 +23,7 @@ ball_x, ball_y = randint(0, WIDTH - 5), randint(0, HEIGHT - 5)
 ENV_GENERATED = False
 
 PNJS = ["🐄", "🐑", "🦆", "🐓", "🐃", "🐂", "🦏", "🐎", "🐖", "🦍", "🐆"]
-TREES = ["🌲", "🌳"]
+TREES = ["🌲", "🌳", "🌴"]
 
 SHOULD_REND = True
 
@@ -61,27 +61,33 @@ def map_it_randomly(elt):
     map_it(elt, randint(0, WIDTH - 1), randint(0, HEIGHT - 1))
 
 
-def generate_trees():
-    global ENV_GENERATED, TREES
+def generate_group(elt):
+    # we can build some forest here
+    x, y = randint(0, WIDTH - 1), randint(0, HEIGHT - 1)
+    rrandxy = randint(1, 2)
 
-    for tree in TREES:
-        # we can build some forest here
-        x, y = randint(0, WIDTH - 1), randint(0, HEIGHT - 1)
-
-        map_it(tree, x, y)
-        map_it(tree, x + randint(1, 3), y)
-        map_it(tree, x, y + randint(1, 3))
-
-        map_it(tree, abs(x - randint(1, 3)), y)
-        map_it(tree, x, abs(y - randint(1, 3)))
+    map_it(elt, x, y)
+    map_it(elt, x + rrandxy, y)
+    map_it(elt, x, y + rrandxy)
+    map_it(elt, x + rrandxy, y + rrandxy)
+    map_it(elt, x + rrandxy, y + rrandxy)
+    map_it(elt, abs(x - rrandxy), y)
+    map_it(elt, x, abs(y - rrandxy))
+    map_it(elt, x, abs(y - rrandxy))
+    map_it(elt, abs(x - rrandxy), y)
+    map_it(elt, abs(x - rrandxy), y + rrandxy)
+    map_it(elt, x + rrandxy, abs(y - rrandxy))
+    map_it(elt, abs(x - rrandxy), abs(y - rrandxy))
+    map_it(elt, abs(x - rrandxy), abs(y - rrandxy))
 
 
 def generate_env():
-    global ENV_GENERATED
+    global ENV_GENERATED, TREES
 
     if not ENV_GENERATED:
-        for i in range(randint(1, 20)):
-            generate_trees()
+        for i in range(randint(1, 30)):
+            tree = TREES[randint(0, len(TREES) - 1)]
+            generate_group(tree)
 
         for i in range(randint(2, 10)):
             map_it_randomly("🪨")
